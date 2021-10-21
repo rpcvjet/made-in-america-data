@@ -16,7 +16,7 @@ jobs:
       - checkout
       - run:
           name: "run script"
-          command: |
+          command:
             "node test.js"
 
 # Invoke jobs via workflows
