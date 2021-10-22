@@ -1,16 +1,10 @@
 const fs = require('fs')
 const crypto = require('crypto')
-const axios  = require('axios');
 const dataDir = './_data'
-// const waiversFile = `${dataDir}/waivers-data.json`
-// const newWaiversFile = `${dataDir}/current-waivers.json`
-let waiversFile;
-let newWaiversFile;
+const waiversFile = `${dataDir}/waivers-data.json`
+const newWaiversFile = `${dataDir}/current-waivers.json`
 let oldData;
-let newData;
-// const newData = JSON.parse(fs.readFileSync(`${newWaiversFile}`, 'utf-8' ,2))
-const DATAURL = "https://portal-test.forms.gov/mia-test/workingmadeinamericanonavailabilitywaiverrequest/submission?created__gt=2021-10-13&select=state,data.requestStatus,data.psc,data.postSolicitationContainer.procurementTitle,data.contractingOfficeAgencyName,data.contractingOfficeAgencyId,data.fundingAgencyId,data.fundingAgencyName,data.procurementStage,data.naics,data.summaryOfProcurement,data.waiverRationaleSummary,data.sourcesSoughtOrRfiIssued,data.expectedMaximumDurationOfTheRequestedWaiver,data.isPricePreferenceIncluded,created,modified,data.ombDetermination,data.conditionsApplicableToConsistencyDetermination";
-const FORMSKEY = process.env.FORMS_API_KEY
+const newData = JSON.parse(fs.readFileSync(`${newWaiversFile}`, 'utf-8' ,2))
 
 async function loadData() {
   try {
@@ -25,42 +19,19 @@ async function loadData() {
   }
 
 }
- async function getData(url){
-  try {
-    console.log('async data request...')
-    const result = axios.get(url, {headers: {
-      'x-token': FORMSKEY
-    }})
-    return result
- }
- catch(err) {
-   console.error(err)
- }
-}
-async function smokeCheck (){  
-  try{
-    console.log('checking if files exist...')
-    if(!fs.existsSync(`${dataDir}/waivers-data.json`)) {
-      console.log('file not here')
-     fs.writeFileSync(`${dataDir}/waivers-data.json`, JSON.stringify([]), (err) => {
-       if(err) {console.log('err', err) } else {
-         console.log('data written to file')
-       }
-     })
-      await getData(DATAURL).then(res => {
-       fs.writeFileSync(`${dataDir}/waivers-data.json`, JSON.stringify(res.data), 'utf-8', null, 2)
-       //  oldData = JSON.parse(fs.readFileSync(`${waiversFile}`, 'utf-8'))
-        return;
-     })
-    } 
-    console.log('Smoke Check completed')
 
-  }
-  catch(err) {
-    console.error('errror in smoke test', err)
-  }
+ smokeCheck = () => {  
+   console.log('checking if files exist...')
+   if(!fs.existsSync(`${waiversFile}`)) {
+     fs.writeFileSync(`${waiversFile}`, JSON.stringify([], null, 2), (err) => {
+       if(err) console.log('err', err)
+       console.log('data written to file')
+     })
+     oldData = JSON.parse(fs.readFileSync(`${waiversFile}`, 'utf-8' ,2))
+     return;
+   } 
+   console.log('Smoke Check completed')
 }
-
 copyImportedFiles = () => {
   if(oldData?.length === 0) {
     console.log('nothing here so copying files');

@@ -17,7 +17,7 @@ jobs:
       - run:
           name: "run script"
           command: 
-            "sh ./data.sh && node buildwaiverdata.js"
+           "npm install axios && node buildwaiverdata.js"
             
 
 # Invoke jobs via workflows
