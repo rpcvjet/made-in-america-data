@@ -16,8 +16,9 @@ jobs:
       - checkout
       - run:
           name: "run script"
-          command:
-            "node test.js"
+          command: 
+            "echo $FORMS_API_KEY && echo $FORMS_API_URL"
+            
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
