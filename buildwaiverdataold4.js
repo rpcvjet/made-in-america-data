@@ -56,11 +56,11 @@ async function smokeCheck() {
         return;
       })
     }
-    oldData = JSON.parse(fs.readFileSync(`${dataDir}/waivers-data.json`, 'utf-8'))
+    oldData = JSON.parse(fs.readFileSync(`${waiversFile}`, 'utf-8'))
     console.log('Smoke Check completed')
   }
   catch (err) {
-    console.error('error in smoke test', err)
+    console.error('errror in smoke test', err)
   }
 }
 
