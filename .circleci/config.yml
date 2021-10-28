@@ -31,4 +31,5 @@ workflows:
           type: approval
           requires:
           - run-script
+      - run-script
 
