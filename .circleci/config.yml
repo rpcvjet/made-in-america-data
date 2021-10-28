@@ -27,6 +27,7 @@ jobs:
 workflows:
   execute-bash-workflow:
     jobs:
-      - run-script:
+      - approval:
           type: approval
+      - run-script
 
