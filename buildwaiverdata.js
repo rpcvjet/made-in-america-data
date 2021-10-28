@@ -52,7 +52,7 @@ async function smokeCheck() {
       })
       await getData(DATAURL).then(res => {
         fs.writeFileSync(waiversFile, JSON.stringify(res.data), 'utf-8', null, 2)
-        oldData = JSON.parse(fs.readFileSync(`${waiversFile}`, 'utf-8'))
+        oldData = JSON.parse(fs.readFileSync(waiversFile, 'utf-8'))
         return;
       })
     }
@@ -65,20 +65,25 @@ async function smokeCheck() {
 }
 
 async function addNewWaivers() {
-  console.log('Adding New Waivers...')
-  oldData = JSON.parse(fs.readFileSync(`${waiversFile}`, 'utf-8', 2))
-  newWaiversFile = `${dataDir}/current-waivers.json`
-  await getData(DATAURL).then(res => {
-    console.log('ADDING NEW WAIVERS!!!!!!')
-    fs.writeFileSync(newWaiversFile, JSON.stringify(res.data), 'utf-8', null, 2)
-    newData = JSON.parse(fs.readFileSync(`${newWaiversFile}`, 'utf-8'))
-    return;
-  })
-  const diff = newData.filter(n => !oldData?.some(item => n._id === item._id))
-  // build new data
-  console.log('FINISHED ADDING NEW WAIVERS...')
-  // update our waiver data file
-  fs.writeFileSync(`${waiversFile}`, JSON.stringify(diff))
+  //if there is no new data in the directory
+  if(!fs.existsSync(`${dataDir}/current-waivers.json`)) {
+    //get the data and write it to json
+    await getData(DATAURL).then(res => {
+      console.log('ADDING NEW WAIVERS!!!!!!')
+      fs.writeFileSync(`${dataDir}/current-waivers.json`, JSON.stringify(res.data), 'utf-8', null, 2)
+      //and lets call it newData
+      newData = JSON.parse(fs.readFileSync(`${dataDir}/current-waivers.json`, 'utf-8'))
+      // update our waiver data file
+      const diff = newData.filter(n => !oldData?.some(item => n._id === item._id))
+      console.log('here2') 
+      //compare objects that are not in old and write them into the new file
+      fs.writeFileSync(`${newData}`, JSON.stringify(diff), 'utf-8')
+      console.log('FINISHED ADDING NEW WAIVERS...')
+      return;
+    })
+
+  }
+  // oldData = fs.readFileSync(`${waiversFile}`, 'utf-8', 2)
 }
 
 copyImportedFiles = () => {
@@ -99,9 +104,11 @@ copyImportedFiles = () => {
 }
 
 async function pushtoRepo(data) {
-  let response = await getData(GITHUBURL)
+  let response  = await getData(GITHUBURL);
+
+  console.log('response', response)
   const shaValue = response.data.sha;
-  
+  console.log('sha value', shaValue)
   let buffered = Buffer.from(JSON.stringify(data)).toString('base64')
   var jsondata = JSON.stringify({
     "message": "uploading a json file file",
@@ -130,20 +137,19 @@ async function pushtoRepo(data) {
 }
 
 updateReviewedWaivers = () => {
-   oldData = JSON.parse(fs.readFileSync(`${waiversFile}`, 'utf-8'))
-
+  //  oldData = JSON.parse(fs.readFileSync(`${waiversFile}`, 'utf-8'))
   // //slice out and replace based on modified date
   console.log('Updating Waivers with new modified date')
   let modifiedWaivers = compareJSONsforChangesInModifiedDate(oldData, newData)
   let final = newData.map(obj => modifiedWaivers.find(o => obj._id === o._id) || obj)
-  fs.writeFileSync(`${dataDir}/waivers-data.json`, JSON.stringify(final))
-  fs.unlinkSync(`${newWaiversFile}`)
+  fs.writeFileSync(`${dataDir}/waivers-data.json`, JSON.stringify(final), 'utf-8')
+  fs.unlinkSync(`${dataDir}/current-waivers.json`)
 }
 
 
 function compareJSONsforChangesInModifiedDate(prev, current) {
-  console.log('prev', prev)
-    // console.log('prev', prev)
+  // console.log('prev', prev)
+    // console.log('curr', current)
    var result = current.filter(({modified}) =>
     !prev.some(o => new Date(o.modified).getTime() === new Date(modified).getTime())
   );
