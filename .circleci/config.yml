@@ -29,5 +29,6 @@ workflows:
     jobs:
       - approval:
           type: approval
-      - run-script
+          requires:
+          - run-script
 
