@@ -8,7 +8,8 @@ let oldData;
 let newData;
 const DATAURL = "https://portal-test.forms.gov/mia-test/workingmadeinamericanonavailabilitywaiverrequest/submission?created__gt=2021-10-13&select=state,data.requestStatus,data.psc,data.postSolicitationContainer.procurementTitle,data.contractingOfficeAgencyName,data.contractingOfficeAgencyId,data.fundingAgencyId,data.fundingAgencyName,data.procurementStage,data.naics,data.summaryOfProcurement,data.waiverRationaleSummary,data.sourcesSoughtOrRfiIssued,data.expectedMaximumDurationOfTheRequestedWaiver,data.isPricePreferenceIncluded,created,modified,data.ombDetermination,data.conditionsApplicableToConsistencyDetermination"
 const GITHUBURL = "https://api.github.com/repos/GSA/made-in-america-data/contents/waivers-data.json"
-const API_KEY = process.env.FORMS_API_KEY;
+const API_KEY = process.env.GH_API_KEY
+const FORMSKEY = process.env.FORMS_API_KEY;
 
 async function loadData() {
   try {
@@ -29,7 +30,7 @@ async function getData(url) {
     console.log('async data request...')
     const result = axios.get(url, {
       headers: {
-        'x-token': '3VpSgcPXnosTgjep4hIyPGh12xLSSS'
+        'x-token': FORMSKEY
       }
     })
     return result
