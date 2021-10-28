@@ -29,7 +29,7 @@ workflows:
     jobs:
       - approval:
           type: approval
-          requires:
-          - run-script
-      - run-script
+      - run-script:
+          requires: 
+          - approval
 
