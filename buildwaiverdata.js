@@ -8,7 +8,7 @@ let newWaiversFile;
 let oldData;
 let newData;
 const DATAURL = "https://portal-test.forms.gov/mia-test/workingmadeinamericanonavailabilitywaiverrequest/submission?created__gt=2021-10-13&select=state,data.requestStatus,data.psc,data.postSolicitationContainer.procurementTitle,data.contractingOfficeAgencyName,data.contractingOfficeAgencyId,data.fundingAgencyId,data.fundingAgencyName,data.procurementStage,data.naics,data.summaryOfProcurement,data.waiverRationaleSummary,data.sourcesSoughtOrRfiIssued,data.expectedMaximumDurationOfTheRequestedWaiver,data.isPricePreferenceIncluded,created,modified,data.ombDetermination,data.conditionsApplicableToConsistencyDetermination"
-const GITHUBURL = "https://api.github.com/repos/GSA/made-in-america-data/contents/test.json"
+const GITHUBURL = "https://api.github.com/repos/GSA/made-in-america-data/contents/waivers-data.json"
 const API_KEY = process.env.GH_API_KEY
 const FORMSKEY = process.env.FORMS_API_KEY;
 
@@ -136,7 +136,7 @@ function compareJSONsforChangesInModifiedDate(prev, current) {
   return result
 }
 
-async function ajaxMethod(data, shaValue) {
+function ajaxMethod(data, shaValue) {
   let buffered = Buffer.from(JSON.stringify(data)).toString('base64') 
   var jsondata = JSON.stringify({
       "message": "uploading a json file file",
