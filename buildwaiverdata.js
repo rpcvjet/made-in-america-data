@@ -2,12 +2,10 @@ const fs = require('fs')
 const crypto = require('crypto')
 const axios = require('axios');
 const dataDir = './_data';
-let firstPull = false;
 let waiversFile;
-let newWaiversFile;
 let oldData;
 let newData;
-const DATAURL = "https://portal-test.forms.gov/mia-test/workingmadeinamericanonavailabilitywaiverrequest/submission?created__gt=2021-10-13&select=state,data.requestStatus,data.psc,data.postSolicitationContainer.procurementTitle,data.contractingOfficeAgencyName,data.contractingOfficeAgencyId,data.fundingAgencyId,data.fundingAgencyName,data.procurementStage,data.naics,data.summaryOfProcurement,data.waiverRationaleSummary,data.sourcesSoughtOrRfiIssued,data.expectedMaximumDurationOfTheRequestedWaiver,data.isPricePreferenceIncluded,created,modified,data.ombDetermination,data.conditionsApplicableToConsistencyDetermination"
+const DATAURL = "https://portal-test.forms.gov/mia-test/madeinamericanonavailabilitywaiverrequest/submission?created__gt=2021-10-13&select=state,data.requestStatus,data.psc,data.procurementTitle,data.contractingOfficeAgencyName,data.waiverCoverage, data.contractingOfficeAgencyId,data.fundingAgencyId,data.fundingAgencyName,data.procurementStage,data.naics,data.summaryOfProcurement,data.waiverRationaleSummary,data.sourcesSoughtOrRfiIssued,data.expectedMaximumDurationOfTheRequestedWaiver,data.isPricePreferenceIncluded,created,modified,data.ombDetermination,data.conditionsApplicableToConsistencyDetermination,data.solicitationId"
 const GITHUBURL = "https://api.github.com/repos/GSA/made-in-america-data/contents/waivers-data.json"
 const API_KEY = process.env.GH_API_KEY
 const FORMSKEY = process.env.FORMS_API_KEY;
@@ -16,7 +14,6 @@ async function loadData() {
   try {
     await smokeCheck();
     await addNewWaivers();
-    await copyImportedFiles();
     await updateReviewedWaivers();
     await pushtoRepo(oldData)
     console.log('COMPLETED')
@@ -30,7 +27,8 @@ async function loadData() {
 async function getData(url) {
   try {
     console.log('async data request...')
-    const result = await axios.get(url, {
+    const result = await axios(url, {
+      method: 'get',
       headers: {
         'x-token': FORMSKEY
       }
@@ -46,7 +44,6 @@ async function smokeCheck() {
   try {
     console.log('checking if files exist...')
     if (!fs.existsSync(`${dataDir}/waivers-data.json`)) {
-      firstPull = true;
       waiversFile = `${dataDir}/waivers-data.json`
       console.log('file not here')
       fs.writeFileSync(waiversFile, JSON.stringify([]), (err) => {
@@ -59,8 +56,7 @@ async function smokeCheck() {
         oldData = JSON.parse(fs.readFileSync(waiversFile, 'utf-8'))
         return;
       })
-    } else {
-      firstPull = false;
+    } else { 
       oldData = JSON.parse(fs.readFileSync(`${dataDir}/waivers-data.json`, 'utf-8'))
       console.log('Smoke Check completed')
     }
@@ -85,38 +81,23 @@ async function addNewWaivers() {
       //compare objects that are not in old and write them into the new file
       fs.writeFileSync(`${newData}`, JSON.stringify(diff), 'utf-8')
       console.log('FINISHED ADDING NEW WAIVERS...')
+      console.log('There are ' + newData.length + ' waivers in the current file')
       return;
     })
   }
   // oldData = fs.readFileSync(`${waiversFile}`, 'utf-8', 2)
 }
 
-copyImportedFiles = () => {
-  if (oldData.length === 0) {
-    console.log('nothing here so copying files');
-    // find unique waivers
-    const diff = newData.filter(n => !oldData?.some(item => n._id === item._id))
-    // build new data
-    console.log('finished building new data...')
-    // update our waiver data file
-    oldData = fs.writeFileSync(`${waiversFile}`, JSON.stringify(diff))
-  } else {
-
-    console.log('There are ' + oldData.length + ' waivers in this file')
-    return
-  }
-
-}
 
 async function pushtoRepo(data) {
-  if(firstPull === true) {
-    await ajaxMethod(data,'')
-  } else {
-    console.log('getting SHA Value for Update')
-    let response  = await getData(GITHUBURL);
-    const shaValue = response.data.sha;
-    await ajaxMethod(data,shaValue)
-  }
+   await ajaxMethod(data,'')
+}
+
+async function updateRepo(data) {
+  console.log('getting SHA Value for Update')
+  let response = await getData(GITHUBURL);
+  const shaValue = response.data.sha;
+  ajaxMethod(data,shaValue)
 }
 
 updateReviewedWaivers = () => {
@@ -139,7 +120,7 @@ function compareJSONsforChangesInModifiedDate(prev, current) {
 function ajaxMethod(data, shaValue) {
   let buffered = Buffer.from(JSON.stringify(data)).toString('base64') 
   var jsondata = JSON.stringify({
-      "message": "uploading a json file file",
+      "message": "uploading a json file file again",
       "content": buffered,
       "sha" : shaValue
   })
@@ -156,10 +137,16 @@ function ajaxMethod(data, shaValue) {
   
     axios(config)
       .then(function (response) {
-        console.log(JSON.stringify(response.data));
+        console.log(JSON.stringify(response.data))
+        return JSON.stringify(response.data);
       })
       .catch(function (error) {
-        console.log(error);
+        if(error.response.status === 409) {
+          console.log('409 error!!!!!!!!')
+          updateRepo(data);
+        } else {
+          console.log('error', error)
+        }
       });
 }
 
