@@ -33,7 +33,64 @@ async function getData(url) {
         'x-token': FORMSKEY
       }
     })
-    return result
+    const sha = result.data.sha;
+    const mappedData = (ajaxdata) => {
+      if(ajaxdata.data.encoding === 'base64') {
+        console.log('Converting BASE 64 to UTF-8') 
+        let buffObj = Buffer.from(ajaxdata.data.content, 'base64') 
+        let text = buffObj.toString('utf-8')      
+        ajaxdata.data = JSON.parse(text)
+      }
+   
+      return ajaxdata.data.map(item => {
+        let temp = Object.assign({}, item)
+        if(temp.data.expectedMaximumDurationOfTheRequestedWaiver === 'between2And3Years') {
+           temp.data.expectedMaximumDurationOfTheRequestedWaiver = 'Between 2 and 3 years'
+        } 
+        if(temp.data.expectedMaximumDurationOfTheRequestedWaiver === 'instantDeliveryOnly'){
+        temp.data.expectedMaximumDurationOfTheRequestedWaiver = 'Instant Delivery Only'
+        }
+        if(temp.data.expectedMaximumDurationOfTheRequestedWaiver === '06Months'){
+          temp.data.expectedMaximumDurationOfTheRequestedWaiver = '0 - 6 months'
+        }
+        if(temp.data.expectedMaximumDurationOfTheRequestedWaiver === 'between6MonthsAnd1Year'){
+          temp.data.expectedMaximumDurationOfTheRequestedWaiver = 'Between 6 months and 1 year'
+        }
+        if(temp.data.expectedMaximumDurationOfTheRequestedWaiver === 'between1And2Years'){
+          temp.data.expectedMaximumDurationOfTheRequestedWaiver = 'Between 1 and 2 years'
+        }   
+        if(temp.data.expectedMaximumDurationOfTheRequestedWaiver === 'between3And5Years'){
+          temp.data.expectedMaximumDurationOfTheRequestedWaiver = 'Between 3 and 5 years'
+        }     
+        if(temp.data.expectedMaximumDurationOfTheRequestedWaiver === 'moreThan5Years'){
+          temp.data.expectedMaximumDurationOfTheRequestedWaiver = 'More than 5 years'
+        }
+        if (temp.data.procurementStage === 'postSolicitation'){
+          temp.data.procurementStage = 'Post-solicitation';
+        }
+        if (temp.data.procurementStage === 'preSolicitation') {
+          temp.data.procurementStage = 'Pre-solicitation';
+        } 
+        if (temp.data.waiverCoverage === 'individualWaiver'){
+          temp.data.waiverCoverage = 'Individual waiver';
+        }
+        if (temp.data.waiverCoverage === 'individualWaiver'){
+          temp.data.waiverCoverage = 'Individual waiver';
+        }else {
+          temp.data.waiverCoverage = 'Multi-procurement waiver';
+          }
+
+        return temp
+      })
+    }
+    
+   let final = mappedData(result)
+   if(sha) {
+     console.log('including sha value...')
+     final['sha'] = sha
+     return final
+   }
+    return final;
   }
   catch (err) {
     console.error(err)
@@ -52,7 +109,7 @@ async function smokeCheck() {
         }
       })
       await getData(DATAURL).then(res => {
-        fs.writeFileSync(waiversFile, JSON.stringify(res.data), 'utf-8', null, 2)
+        fs.writeFileSync(waiversFile, JSON.stringify(res), 'utf-8', null, 2)
         oldData = JSON.parse(fs.readFileSync(waiversFile, 'utf-8'))
         return;
       })
@@ -72,7 +129,7 @@ async function addNewWaivers() {
     //get the data and write it to json
     await getData(DATAURL).then(res => {
       console.log('ADDING NEW WAIVERS!!!!!!')
-      fs.writeFileSync(`${dataDir}/current-waivers.json`, JSON.stringify(res.data), 'utf-8', null, 2)
+      fs.writeFileSync(`${dataDir}/current-waivers.json`, JSON.stringify(res), 'utf-8', null, 2)
       //and lets call it newData
       newData = JSON.parse(fs.readFileSync(`${dataDir}/current-waivers.json`, 'utf-8'))
       // update our waiver data file
@@ -96,7 +153,7 @@ async function pushtoRepo(data) {
 async function updateRepo(data) {
   console.log('getting SHA Value for Update')
   let response = await getData(GITHUBURL);
-  const shaValue = response.data.sha;
+  const shaValue = response.sha;
   ajaxMethod(data,shaValue)
 }
 
