@@ -76,10 +76,10 @@ async function getData(url) {
         }
         if (temp.data.waiverCoverage === 'individualWaiver'){
           temp.data.waiverCoverage = 'Individual waiver';
-        }else {
+        }
+        if(temp.data.waiverCoverage === 'multiProcurementWaiver') {
           temp.data.waiverCoverage = 'Multi-procurement waiver';
-          }
-
+        }
         return temp
       })
     }
