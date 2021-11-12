@@ -6,7 +6,7 @@ let waiversFile;
 let oldData;
 let newData;
 const DATAURL = "https://submission.forms.gov/mia-live/madeinamericanonavailabilitywaiverrequest/submission?&select=state,data.requestStatus,data.psc,data.procurementTitle,data.contractingOfficeAgencyName,data.waiverCoverage, data.contractingOfficeAgencyId,data.fundingAgencyId,data.fundingAgencyName,data.procurementStage,data.naics,data.summaryOfProcurement,data.waiverRationaleSummary,data.sourcesSoughtOrRfiIssued,data.expectedMaximumDurationOfTheRequestedWaiver,data.isPricePreferenceIncluded,created,modified,data.ombDetermination,data.conditionsApplicableToConsistencyDetermination,data.solicitationId"
-const GITHUBURL = "https://api.github.com/repos/GSA/made-in-america-data/contents/waivers-data-prod.json"
+const GITHUBURL = "https://api.github.com/repos/GSA/made-in-america-data/contents/waivers-data.json"
 const API_KEY = process.env.GH_API_KEY
 const FORMSKEY = process.env.FORMS_API_KEY;
 
