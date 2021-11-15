@@ -99,6 +99,13 @@ async function getData(url) {
         if(temp.data.isPricePreferenceIncluded === 'yes') {
           temp.data.isPricePreferenceIncluded = 'Yes'
         }
+        if(temp.data.requestStatus === 'reviewed') {
+          temp.data.requestStatus = 'Reviewed'
+        }
+        if(temp.data.requestStatus === 'submitted') {
+          temp.data.requestStatus = 'Submitted'
+        }
+       
         return temp
       })
     }
