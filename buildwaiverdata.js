@@ -199,15 +199,13 @@ function updateReviewedWaivers () {
 }
 
 
-function compareJSONsforChangesInModifiedDate(prev, current) {
-  if(prev) {
-    // * return the objects that do not have the same modified date. 
+function compareJSONsforChangesInModifiedDate(prev, current) {    // * return the objects that do not have the same modified date. 
      const result = current.filter(({modified}) =>
     //  * ...convert Date object to correctly compare date
       !prev.some(o => new Date(o.modified).getTime() === new Date(modified).getTime())
     );
     return result;
-  }
+  
 }
 
 function ajaxMethod(data, shaValue) {
@@ -218,9 +216,10 @@ function ajaxMethod(data, shaValue) {
   const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
   let jsondata = JSON.stringify({
-      "message": "uploading a json file on " + event.toLocaleDateString(undefined, options),
+      "message": "file uploaded on " + event.toLocaleDateString(undefined, options) + " at " + event.toLocaleTimeString('en-US'),
       "content": buffered,
-      "sha" : shaValue
+      "sha" : shaValue,
+      "branch": "main"
   })
 
   let config = {
