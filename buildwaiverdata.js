@@ -81,6 +81,15 @@ async function getData(url) {
         if(temp.data.waiverCoverage === 'multiProcurementWaiver') {
           temp.data.waiverCoverage = 'Multi-procurement waiver';
         }
+        if(temp.data.ombDetermination === 'consistentWithPolicy') {
+          temp.data.ombDetermination = 'Consistent with Policy'
+        }
+        if(temp.data.ombDetermination === 'inconsistentWithPolicy') {
+          temp.data.ombDetermination = 'Inconsistent with Policy'
+        }
+        if(temp.data.ombDetermination === 'conditionallyConsistentWithPolicy') {
+          temp.data.ombDetermination = 'Conditionally Consistent with Policy'
+        }
         return temp
       })
     }
@@ -191,20 +200,25 @@ function updateReviewedWaivers () {
 
 
 function compareJSONsforChangesInModifiedDate(prev, current) {
+  if(prev) {
     // * return the objects that do not have the same modified date. 
      const result = current.filter(({modified}) =>
     //  * ...convert Date object to correctly compare date
       !prev.some(o => new Date(o.modified).getTime() === new Date(modified).getTime())
     );
     return result;
+  }
 }
 
 function ajaxMethod(data, shaValue) {
   // * when pushing to github, the data must be encoded to base64 format
   let buffered = Buffer.from(JSON.stringify(data)).toString('base64') 
   //  * and then the commit message, and all data must be stringfied
+  const event = new Date(Date.now());
+  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+
   let jsondata = JSON.stringify({
-      "message": "uploading a json file file again",
+      "message": "uploading a json file on " + event.toLocaleDateString(undefined, options),
       "content": buffered,
       "sha" : shaValue
   })
