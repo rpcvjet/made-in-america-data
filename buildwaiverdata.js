@@ -11,7 +11,7 @@ const FORMSKEY = process.env.FORMS_API_KEY;
 
 async function loadData() {
   try {
-      smokeCheck();
+      await smokeCheck();
       await addNewWaivers();
       updateReviewedWaivers();
       pushtoRepo(oldData)
