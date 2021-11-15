@@ -73,13 +73,10 @@ async function getData(url) {
           temp.data.procurementStage = 'Pre-solicitation';
         } 
         if (temp.data.waiverCoverage === 'individualWaiver'){
-          temp.data.waiverCoverage = 'Individual waiver';
-        }
-        if (temp.data.waiverCoverage === 'individualWaiver'){
-          temp.data.waiverCoverage = 'Individual waiver';
+          temp.data.waiverCoverage = 'Individual Waiver';
         }
         if(temp.data.waiverCoverage === 'multiProcurementWaiver') {
-          temp.data.waiverCoverage = 'Multi-procurement waiver';
+          temp.data.waiverCoverage = 'Multi-procurement Waiver';
         }
         if(temp.data.ombDetermination === 'consistentWithPolicy') {
           temp.data.ombDetermination = 'Consistent with Policy'
@@ -89,6 +86,18 @@ async function getData(url) {
         }
         if(temp.data.ombDetermination === 'conditionallyConsistentWithPolicy') {
           temp.data.ombDetermination = 'Conditionally Consistent with Policy'
+        }
+        if(temp.data.sourcesSoughtOrRfiIssued === 'no') {
+          temp.data.sourcesSoughtOrRfiIssued = 'No'
+        }
+        if(temp.data.sourcesSoughtOrRfiIssued === 'yes') {
+          temp.data.sourcesSoughtOrRfiIssued = 'Yes'
+        }
+        if(temp.data.isPricePreferenceIncluded === 'no') {
+          temp.data.isPricePreferenceIncluded = 'No'
+        }
+        if(temp.data.isPricePreferenceIncluded === 'yes') {
+          temp.data.isPricePreferenceIncluded = 'Yes'
         }
         return temp
       })
