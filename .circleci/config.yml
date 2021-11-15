@@ -30,9 +30,6 @@ workflows:
       - schedule:
           cron: "0 14 * * *"
     jobs:
-#      - approval:
-#          type: approval
       - run-script
-#          requires: 
-#          - approval
+
 
