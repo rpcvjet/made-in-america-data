@@ -28,7 +28,7 @@ workflows:
   execute-bash-workflow:
     triggers:
       - schedule:
-          cron: "0 14 * * *"
+          cron: "8 19 * * *"
           filters:
             branches:
               only:
