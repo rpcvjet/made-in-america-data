@@ -235,7 +235,7 @@ function ajaxMethod(data, shaValue) {
       "message": "file uploaded on " + event.toLocaleDateString(undefined, options) + " at " + event.toLocaleTimeString('en-US'),
       "content": buffered,
       "sha" : shaValue,
-      "branch": "main"
+      "branch": "develop"
   })
 
   let config = {

@@ -26,12 +26,9 @@ jobs:
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
   execute-bash-workflow:
-    triggers:
-      - schedule:
-          cron: "0 11,17 * * *"
-          filters:
-            branches:
-              only:
-                - main
     jobs:
-      - run-script
+      - approval:
+          type: approval
+      - run-script:
+          requires: 
+          - approval
